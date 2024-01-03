@@ -1,8 +1,11 @@
 import cv2
 import mediapipe as mp
 
+# Initialize camera and background image
 cap = cv2.VideoCapture(0)
 bgimg = cv2.imread("img.png")
+
+# Initialize Mediapipe Hands module
 mpHands = mp.solutions.hands
 hands = mpHands.Hands()
 mpDraw = mp.solutions.drawing_utils
@@ -10,8 +13,9 @@ hand_positions = {}
 line_thickness = 2  # Initial line thickness
 
 while True:
+    # Capture frame from camera
     success, image = cap.read()
-    image = cv2.flip(image, 1)
+    image = cv2.flip(image, 1)  # Flip the frame horizontally for a more intuitive view
     imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     results = hands.process(imageRGB)
 
@@ -45,9 +49,11 @@ while True:
                 cv2.line(bgimg_copy, (positions[i - 1][0], positions[i - 1][1]), (positions[i][0], positions[i][1]),
                          color=color, thickness=line_thickness)
 
+    # Display frames
     cv2.imshow("Output", image)
     cv2.imshow("background image", bgimg_copy)
 
+    # Handle key events
     key = cv2.waitKey(1)
     if key == ord('x'):
         line_thickness += 1  # Increase the line thickness when 'x' is pressed
@@ -58,5 +64,6 @@ while True:
     elif key == 27:  # Press 'Esc' to exit the program
         break
 
+# Release resources
 cv2.destroyAllWindows()
 cap.release()
