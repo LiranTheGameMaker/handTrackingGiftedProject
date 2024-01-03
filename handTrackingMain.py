@@ -2,35 +2,48 @@ import cv2
 import mediapipe as mp
 
 cap = cv2.VideoCapture(0)
-bgimg = cv2.imread(r'C:\Users\User\PycharmProjects\handTracking\img.png')
+bgimg = cv2.imread("img.png")
 mpHands = mp.solutions.hands
 hands = mpHands.Hands()
 mpDraw = mp.solutions.drawing_utils
-hand_postitions = []
+hand_positions = {}
 
 while True:
-    hand_vector = []
     success, image = cap.read()
     image = cv2.flip(image, 1)
     imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     results = hands.process(imageRGB)
-    # checking whether a hand is detected
+
+    # Create a copy of the background image for each frame
+    bgimg_copy = bgimg.copy()
+
     if results.multi_hand_landmarks:
-        for handLms in results.multi_hand_landmarks:  # working with each hand
+        for handID, handLms in enumerate(results.multi_hand_landmarks):
+            hand_vector = []
             for id, lm in enumerate(handLms.landmark):
                 h, w, c = image.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
-                if id == 9:
-                    hand_vector.append(cx)
-                    hand_vector.append(cy)
-                    hand_postitions.append(hand_vector)
-                    cv2.circle(image, (cx, cy), 25, (255, 0, 255), cv2.FILLED)
+                if id == 8:  # Tip of the index finger for both left and right hands
+                    hand_vector.extend([cx, cy])
+                    hand_positions.setdefault(handID, []).append(hand_vector)
+                    if handID == 0:  # Left hand
+                        color = (0, 0, 255)  # Red
+                    else:  # Right hand
+                        color = (255, 0, 0)  # Blue
+                    cv2.circle(image, (cx, cy), 25, color, cv2.FILLED)
                 mpDraw.draw_landmarks(image, handLms, mpHands.HAND_CONNECTIONS)
-    if len(hand_postitions) == 2:
-        print(f'{hand_postitions[0][0]}, {hand_postitions[0][1]} |||||| {hand_postitions[1][0]}, {hand_postitions[1][1]}')
-        cv2.line(bgimg, (hand_postitions[0][0], hand_postitions[0][1]), (hand_postitions[1][0], hand_postitions[1][1]), color=(255, 0, 255), thickness=2)
-        hand_vector.clear()
-        hand_postitions.clear()
+
+    # Draw lines connecting current positions to previous positions on the copied background image
+    for handID, positions in hand_positions.items():
+        if len(positions) > 1:
+            for i in range(1, len(positions)):
+                if handID == 0:
+                    color = (0, 0, 255)  # Red for left hand
+                else:
+                    color = (255, 0, 0)  # Blue for right hand
+                cv2.line(bgimg_copy, (positions[i - 1][0], positions[i - 1][1]), (positions[i][0], positions[i][1]),
+                         color=color, thickness=2)
+
     cv2.imshow("Output", image)
-    cv2.imshow("background image", bgimg)
+    cv2.imshow("background image", bgimg_copy)
     cv2.waitKey(1)
