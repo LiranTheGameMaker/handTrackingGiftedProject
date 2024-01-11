@@ -1,5 +1,6 @@
 from mediapipe.python.solutions.hands import HandLandmark as HandLM
 
+
 class SimpleHand:
     def __init__(self, id, side, score, lmlist):
         self.id = id
@@ -31,4 +32,3 @@ class SimpleHand:
             HandLM.MIDDLE_FINGER_MCP) and self.getLandmarkY(HandLM.RING_FINGER_TIP) > self.getLandmarkY(
             HandLM.RING_FINGER_MCP) and self.getLandmarkY(HandLM.PINKY_TIP) > self.getLandmarkY(HandLM.PINKY_MCP):
             return True
-

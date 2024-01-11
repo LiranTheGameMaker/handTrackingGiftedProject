@@ -1,12 +1,13 @@
 import cv2
 from mediapipe.python.solutions.hands import HandLandmark as HandLM
-import handTracker
-import SimpleHand
-import HandsList
+from handTracker import handTracker
+from SimpleHand import SimpleHand
+from HandsList import HandsList
 
 RT = "Right"
 LF = "Left"
-canvas = []
+canvas = [int, int]
+
 
 def main():
     bgImage = cv2.imread(r'img.png')
@@ -36,12 +37,14 @@ def main():
                 handsList.addHand(detectedHand)
                 if detectedHand.side == RT:
                     if detectedHand.isIndexFingerUp():
-                        print("ringiding")
-                        cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP), detectedHand.getLandmarkY(HandLM.INDEX_FINGER_TIP)), 10, (255, 0, 0), cv2.FILLED)
+                        cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP),
+                                             detectedHand.getLandmarkY(HandLM.INDEX_FINGER_TIP)), 10, (255, 0, 0),
+                                   cv2.FILLED)
                 else:
                     if detectedHand.isIndexFingerUp():
-                        print("ringiding")
-                        cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP), detectedHand.getLandmarkY(HandLM.INDEX_FINGER_TIP)), 10, (0, 0, 255), cv2.FILLED)
+                        cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP),
+                                             detectedHand.getLandmarkY(HandLM.INDEX_FINGER_TIP)), 10, (0, 0, 255),
+                                   cv2.FILLED)
 
         print(handsList)
 

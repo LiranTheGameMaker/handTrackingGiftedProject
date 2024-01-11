@@ -1,8 +1,8 @@
-import cv2
-import mediapipe as mp
+from handTrackingMain import RT
+
 
 class HandsList:
-    def __int__(self):
+    def __init__(self):
         self.right = None
         self.left = None
 
@@ -36,5 +36,3 @@ class HandsList:
 
     def hasLeft(self):
         return self.left is not None
-
-

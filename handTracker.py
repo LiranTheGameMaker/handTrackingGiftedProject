@@ -2,7 +2,8 @@ import cv2
 import mediapipe as mp
 from mediapipe.python.solutions.hands import HandLandmark as HandLM
 
-class handTracker():
+
+class handTracker:
     def __init__(self, mode=False, maxHands=2, detectionCon=0.5, modelComplexity=1, trackCon=0.5):
         self.mode = mode
         self.maxHands = maxHands
@@ -67,4 +68,3 @@ class handTracker():
                     y = lmlist[targetLm][2]
                     cv2.putText(image, label, (x, y), font, font_scale, color, thickness, cv2.LINE_AA)
             return label, score
-
