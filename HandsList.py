@@ -1,6 +1,5 @@
-from handTrackingMain import RT
-
-
+RT = "Right"
+LF = "Left"
 class HandsList:
     def __init__(self):
         self.right = None

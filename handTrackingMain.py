@@ -3,10 +3,14 @@ from mediapipe.python.solutions.hands import HandLandmark as HandLM
 from handTracker import handTracker
 from SimpleHand import SimpleHand
 from HandsList import HandsList
+import keyboard
 
 RT = "Right"
 LF = "Left"
 canvas = [int, int]
+
+#def maskOutput(image, canvas_size : list):
+   # return maskList.process_image(image, canvas_size)
 
 
 def main():
@@ -19,9 +23,9 @@ def main():
 
     while True:
         success, image = cap.read()
-        canvas = [image.shape[1], image.shape[0]]
+        #canvas = [image.shape[1], image.shape[0]]
         image = cv2.flip(image, 1)
-        bgImage = cv2.resize(bgImage, canvas)
+        #bgImage = cv2.resize(bgImage, canvas)
         image = tracker.processImage(image, debugDraw)
 
         handsList.clear()
@@ -37,17 +41,15 @@ def main():
                 handsList.addHand(detectedHand)
                 if detectedHand.side == RT:
                     if detectedHand.isIndexFingerUp():
-                        cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP),
-                                             detectedHand.getLandmarkY(HandLM.INDEX_FINGER_TIP)), 10, (255, 0, 0),
-                                   cv2.FILLED)
+                        cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP), detectedHand.getLandmarkY(HandLM.INDEX_FINGER_TIP)), 10, (0, 0, 255), cv2.FILLED)
                 else:
                     if detectedHand.isIndexFingerUp():
-                        cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP),
-                                             detectedHand.getLandmarkY(HandLM.INDEX_FINGER_TIP)), 10, (0, 0, 255),
-                                   cv2.FILLED)
+                        cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP), detectedHand.getLandmarkY(HandLM.INDEX_FINGER_TIP)), 10, (255, 0, 0), cv2.FILLED)
+
 
         print(handsList)
-
+        if keyboard.is_pressed('b'):
+            bgImage = cv2.imread(r"img.png")
         cv2.imshow("Video", image)
         cv2.imshow("Canvas", bgImage)
         cv2.waitKey(1)
