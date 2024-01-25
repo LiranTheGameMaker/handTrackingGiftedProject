@@ -9,7 +9,7 @@ class SimpleHand:
         self.lmlist = lmlist
         self.cx, self.cy = self.getLandmarkXY(HandLM.INDEX_FINGER_TIP)
 
-    # Override for print purpse
+    # Override for print purpose
     def __str__(self):
         return f"{self.side}:index position {self.cx}, {self.cy}"
 
