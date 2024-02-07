@@ -76,13 +76,12 @@ def main():
                 mode = False
 
         success, image = cap.read()
-        # canvas = [image.shape[1], image.shape[0]]
+        #canvas = [image.shape[1], image.shape[0]]
         image = cv2.flip(image, 1)
-        # bgImage = cv2.resize(bgImage, canvas)
+        #bgImage = cv2.resize(bgImage, canvas)
         image = tracker.processImage(image, debugDraw)
-        bgImageCopy = bgImage.copy()
         handsList.clear()
-
+        bgImageCopyBackup = bgImage.copy()
         if tracker.foundHands():
             for i in range(tracker.handsCount):
                 # Get landmarks
@@ -95,8 +94,6 @@ def main():
                 handsList.addHand(detectedHand)
 
                 if detectedHand.side == RT:
-                    x, y = detectedHand.getLandmarkXY(HandLM.INDEX_FINGER_TIP)
-                    bgImageCopy = overlay_image(bgImageCopy, cursorRT, x, y)
                     if detectedHand.isIndexFingerUp():
                         if mode is True:
                             cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP),
@@ -116,8 +113,6 @@ def main():
                     else:
                         handPositionListRT.clear()
                 else:
-                    x, y = detectedHand.getLandmarkXY(HandLM.INDEX_FINGER_TIP)
-                    bgImageCopy = overlay_image(bgImageCopy, cursorLF, x, y)
                     if detectedHand.isIndexFingerUp():
                         if mode is True:
                             cv2.circle(bgImage, (detectedHand.getLandmarkX(HandLM.INDEX_FINGER_TIP),
@@ -136,13 +131,21 @@ def main():
                                 handPositionListLF.remove(handPositionListLF[0])
                     else:
                         handPositionListLF.clear()
+        bgImageCopy = bgImage.copy()
         print(handsList)
+        if handsList.hasRight():
+            x, y = handsList.right.getLandmarkXY(HandLM.INDEX_FINGER_TIP)
+            overlay_image(bgImageCopy, cursorRT, x, y)
+        if handsList.hasLeft():
+            x, y = handsList.left.getLandmarkXY(HandLM.INDEX_FINGER_TIP)
+            overlay_image(bgImageCopy, cursorLF, x, y)
         if keyboard.is_pressed('b') or (time.time() - start_time) > 90:
             bgImageCopy = cv2.imread(r"img.png")
             bgImage = cv2.imread(r"img.png")
+
         cv2.imshow("Video", image)
 
-        #cv2.namedWindow("Canvas", cv2.WINDOW_NORMAL)
+        cv2.namedWindow("Canvas", cv2.WINDOW_NORMAL)
         #cv2.setWindowProperty("Canvas", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
         cv2.imshow("Canvas", bgImageCopy)
         closeKey = cv2.waitKey(1) & 0xFF
