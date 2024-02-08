@@ -30,5 +30,6 @@ class SimpleHand:
         if self.getLandmarkY(HandLM.INDEX_FINGER_TIP) < self.getLandmarkY(
                 HandLM.INDEX_FINGER_PIP) and self.getLandmarkY(HandLM.MIDDLE_FINGER_TIP) > self.getLandmarkY(
             HandLM.MIDDLE_FINGER_MCP) and self.getLandmarkY(HandLM.RING_FINGER_TIP) > self.getLandmarkY(
-            HandLM.RING_FINGER_MCP) and self.getLandmarkY(HandLM.PINKY_TIP) > self.getLandmarkY(HandLM.PINKY_MCP):
+            HandLM.RING_FINGER_MCP) and self.getLandmarkY(HandLM.PINKY_TIP) > self.getLandmarkY(
+            HandLM.PINKY_MCP) and self.getLandmarkY(HandLM.INDEX_FINGER_TIP) < self.getLandmarkY(HandLM.INDEX_FINGER_DIP):
             return True

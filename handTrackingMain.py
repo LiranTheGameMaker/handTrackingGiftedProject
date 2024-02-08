@@ -5,7 +5,6 @@ from SimpleHand import SimpleHand
 from HandsList import HandsList
 import keyboard
 import time
-import matplotlib.pyplot as plt
 import numpy as np
 
 RT = "Right"
@@ -21,13 +20,16 @@ def overlay_image(background, overlay, x_offset, y_offset):
     assert fg_channels == 4, f'foreground image should have exactly 4 channels (RGBA). found:{fg_channels}'
 
     # center by default
-    if x_offset is None: x_offset = (bg_w - fg_w) // 2
-    if y_offset is None: y_offset = (bg_h - fg_h) // 2
+    if x_offset is None:
+        x_offset = (bg_w - fg_w) // 2
+    if y_offset is None:
+        y_offset = (bg_h - fg_h) // 2
 
     w = min(fg_w, bg_w, fg_w + x_offset, bg_w - x_offset)
     h = min(fg_h, bg_h, fg_h + y_offset, bg_h - y_offset)
 
-    if w < 1 or h < 1: return
+    if w < 1 or h < 1:
+        return
 
     # clip foreground and background images to the overlapping regions
     bg_x = max(0, x_offset)
@@ -69,19 +71,18 @@ def main():
     mode = False
 
     while True:
-        if cv2.waitKey(1) & 0xFF == ord('m'):
+        if cv2.waitKey(1) == ord('m'):
             if not mode:
                 mode = True
             else:
                 mode = False
 
         success, image = cap.read()
-        #canvas = [image.shape[1], image.shape[0]]
+        # canvas = [image.shape[1], image.shape[0]]
         image = cv2.flip(image, 1)
-        #bgImage = cv2.resize(bgImage, canvas)
+        # bgImage = cv2.resize(bgImage, canvas)
         image = tracker.processImage(image, debugDraw)
         handsList.clear()
-        bgImageCopyBackup = bgImage.copy()
         if tracker.foundHands():
             for i in range(tracker.handsCount):
                 # Get landmarks
@@ -146,7 +147,7 @@ def main():
         cv2.imshow("Video", image)
 
         cv2.namedWindow("Canvas", cv2.WINDOW_NORMAL)
-        #cv2.setWindowProperty("Canvas", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+        # cv2.setWindowProperty("Canvas", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
         cv2.imshow("Canvas", bgImageCopy)
         closeKey = cv2.waitKey(1) & 0xFF
         if closeKey == ord('q'):
