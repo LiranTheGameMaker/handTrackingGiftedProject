@@ -2,12 +2,16 @@ import cv2
 import numpy as np
 from tensorflow import keras
 from tensorflow.keras.applications.mobilenet import preprocess_input
+import matplotlib.pyplot as plt
+import pandas as pd
 
 class QuickDrawPredictor():
     def __init__(self, model):
         self.model = model
         self.model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.002), loss='categorical_crossentropy',
                       metrics=[keras.losses.categorical_crossentropy, keras.metrics.categorical_accuracy, "accuracy"])
+
+    fig = plt.figure(figsize=(10,7))
 
     # store the label codes in a dictionary
     dict_var = {0: 'airplane', 1: 'alarm_clock', 2: 'ambulance', 3: 'angel', 4: 'animal_migration', 5: 'ant',
@@ -84,18 +88,28 @@ class QuickDrawPredictor():
                 334: 'wine_bottle', 335: 'wine_glass', 336: 'wristwatch', 337: 'yoga', 338: 'zebra', 339: 'zigzag'}
     label_list = list(dict_var.values())
 
+    def show(self, img, title, spot):
+        self.fig.add_subplot(3,3, spot)
+        plt.axis('off')
+        plt.title(title)
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+
     def predict(self, img_n):
         if type(img_n) == str:
             img = cv2.imread(img_n, cv2.IMREAD_GRAYSCALE)
         elif type(img_n) == np.ndarray:
             img = cv2.cvtColor(img_n, cv2.COLOR_BGR2GRAY)
+        self.show(img, "input", 1)
         x = np.zeros((80, 80))
         x[:, :] = self.resize_keep_aspect_ratio(img, (80, 80))
         x = preprocess_input(x).astype(np.float32)
+        self.show(x, "resized", 2)
         x = 1 - x
+        self.show(x, "inverted", 3)
         x = self.remove_rows_all_ones(x.copy())
         x = self.remove_columns_all_ones(x.copy())
         x = self.pad_right_bottom(x, (80,80), 0)
+        self.show(x, "padded", 4)
         if np.any(x > 0):
             np.where(x > 0, 1, -1)
         x = x.reshape(1, 80, 80, 1).astype(np.float32)
@@ -103,7 +117,7 @@ class QuickDrawPredictor():
         return prediction
 
     def process(self, prediction):
-        return np.argsort(-prediction, axis=1)
+        return self.label_list[np.argmax(prediction)]
 
     def pad_right_bottom(self, data, target_size=(80, 80), pad_value=0):
         # Calculate the amount of padding needed for each dimension

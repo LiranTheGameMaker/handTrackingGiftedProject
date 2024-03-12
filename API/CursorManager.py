@@ -7,7 +7,7 @@ class CursorManager():
         self.cursorLF = cv2.resize(cv2.imread(cursorLeftPath, cv2.IMREAD_UNCHANGED), cursorLFdimentions)
 
     def displayCursor(self, background, xStartPosition, yStartPosition, cursorName : str):
-        if cursorName is "Right":
+        if cursorName == "Right":
             return self.overlay_image(background, self.cursorRT, xStartPosition, yStartPosition)
         return self.overlay_image(background, self.cursorLF, xStartPosition, yStartPosition)
 
