@@ -92,7 +92,7 @@ class QuickDrawPredictor():
         self.fig.add_subplot(3,3, spot)
         plt.axis('off')
         plt.title(title)
-        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_GRAY2RGB))
 
     def predict(self, img_n):
         if type(img_n) == str:
@@ -109,15 +109,21 @@ class QuickDrawPredictor():
         x = self.remove_rows_all_ones(x.copy())
         x = self.remove_columns_all_ones(x.copy())
         x = self.pad_right_bottom(x, (80,80), 0)
+        #x = cv2.resize(x.copy(), (80,80), interpolation=cv2.INTER_CUBIC)
+        print(x.shape)
         self.show(x, "padded", 4)
         if np.any(x > 0):
-            np.where(x > 0, 1, -1)
-        x = x.reshape(1, 80, 80, 1).astype(np.float32)
-        prediction = self.model.predict(x)
+            print("True")
+            x = np.where(x > 0, 1, -1)
+        #self.show(x, "clean", 5)
+        x = x.copy().reshape(1, 80, 80, 1).astype(np.float32)
+        prediction = self.model.predict(x, verbose = 1)
         return prediction
 
-    def process(self, prediction):
-        return self.label_list[np.argmax(prediction)]
+    def process(self, prediction, incorrect_list):
+        if self.label_list[np.argmax(prediction)] in incorrect_list:
+            prediction.remove(np.argmax(prediction))
+        return self.label_list[np.argmax(prediction)], incorrect_list
 
     def pad_right_bottom(self, data, target_size=(80, 80), pad_value=0):
         # Calculate the amount of padding needed for each dimension

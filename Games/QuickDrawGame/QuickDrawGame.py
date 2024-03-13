@@ -12,9 +12,10 @@ class QuickDrawGame:
         self.is_running = False
 
     def run(self):
+        inc_list = []
         self.is_running = True
         start_time = time.time()
-        model = keras.models.load_model(r'Games\QuickDrawGame\model.keras', compile=False)
+        model = keras.saving.load_model('Games/QuickDrawGame/sketch_recognition_mobilenet.keras', compile=False)
         bg_image = cv2.resize(cv2.imread(r'Games/QuickDrawGame/img.png').copy(), (920, 768))
         cursorManager = CursorManager(r'Games/QuickDrawGame/cursorRight.png', r'Games/SimpleDrawGame/cursorRight.png')
         predictor = QuickDrawPredictor(model=model)
@@ -55,7 +56,11 @@ class QuickDrawGame:
                                 start_time = time.time()
                                 handPositionListLF.remove(handPositionListLF[0])
                                 handPositionListLF.remove(handPositionListLF[0])
+                else:
+                    handPositionListLF.clear()
+                    handPositionListRT.clear()
                 if hand.isHandOpen():
+                    prediction = predictor.process(predictor.predict(bg_image.copy()))
                     plt.show()
             bg_image_copy = bg_image.copy()
             if tracker.hands_list.has_left():
@@ -65,8 +70,9 @@ class QuickDrawGame:
                 x, y = tracker.hands_list.right.getLandmarkXY(HandLM.INDEX_FINGER_TIP)
                 cursorManager.displayCursor(bg_image_copy, x, y, "Right")
             if (time.time() - start_time) >= 2:
-                prediction = predictor.process(predictor.predict(bg_image.copy()))
-                print(prediction)
+                cv2.imshow("image", bg_image)
+                prediction, inc_list = predictor.process(predictor.predict('Games\QuickDrawGame\clock.png'), inc_list)
+                cv2.putText(bg_image_copy, prediction)
                 start_time = time.time()
                 #cv2.putText(bg_image, predictor.label_list[prediction[0]])'
 
