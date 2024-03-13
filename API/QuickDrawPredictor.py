@@ -99,30 +99,28 @@ class QuickDrawPredictor():
             img = cv2.imread(img_n, cv2.IMREAD_GRAYSCALE)
         elif type(img_n) == np.ndarray:
             img = cv2.cvtColor(img_n, cv2.COLOR_BGR2GRAY)
-        self.show(img, "input", 1)
+        #self.show(img, "input", 1)
         x = np.zeros((80, 80))
         x[:, :] = self.resize_keep_aspect_ratio(img, (80, 80))
         x = preprocess_input(x).astype(np.float32)
-        self.show(x, "resized", 2)
+        #self.show(x, "resized", 2)
         x = 1 - x
-        self.show(x, "inverted", 3)
+        #self.show(x, "inverted", 3)
         x = self.remove_rows_all_ones(x.copy())
         x = self.remove_columns_all_ones(x.copy())
         x = self.pad_right_bottom(x, (80,80), 0)
         #x = cv2.resize(x.copy(), (80,80), interpolation=cv2.INTER_CUBIC)
-        print(x.shape)
-        self.show(x, "padded", 4)
+        #self.show(x, "padded", 4)
         if np.any(x > 0):
-            print("True")
             x = np.where(x > 0, 1, -1)
         #self.show(x, "clean", 5)
         x = x.copy().reshape(1, 80, 80, 1).astype(np.float32)
-        prediction = self.model.predict(x, verbose = 1)
+        prediction = self.model.predict(x, verbose = 0)
         return prediction
 
     def process(self, prediction, incorrect_list):
         if self.label_list[np.argmax(prediction)] in incorrect_list:
-            prediction.remove(np.argmax(prediction))
+            np.delete(prediction, np.argmax(prediction))
         return self.label_list[np.argmax(prediction)], incorrect_list
 
     def pad_right_bottom(self, data, target_size=(80, 80), pad_value=0):

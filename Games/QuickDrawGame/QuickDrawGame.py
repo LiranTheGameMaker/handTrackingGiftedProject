@@ -60,8 +60,7 @@ class QuickDrawGame:
                     handPositionListLF.clear()
                     handPositionListRT.clear()
                 if hand.isHandOpen():
-                    prediction = predictor.process(predictor.predict(bg_image.copy()))
-                    plt.show()
+                    prediction, inc_list = predictor.process(predictor.predict(bg_image.copy()), inc_list)
             bg_image_copy = bg_image.copy()
             if tracker.hands_list.has_left():
                 x, y = tracker.hands_list.left.getLandmarkXY(HandLM.INDEX_FINGER_TIP)
@@ -71,8 +70,9 @@ class QuickDrawGame:
                 cursorManager.displayCursor(bg_image_copy, x, y, "Right")
             if (time.time() - start_time) >= 2:
                 cv2.imshow("image", bg_image)
-                prediction, inc_list = predictor.process(predictor.predict('Games\QuickDrawGame\clock.png'), inc_list)
-                cv2.putText(bg_image_copy, prediction)
+                prediction, inc_list = predictor.process(predictor.predict(bg_image.copy()), inc_list)
+                inc_list.append(prediction)
+                print(prediction)
                 start_time = time.time()
                 #cv2.putText(bg_image, predictor.label_list[prediction[0]])'
 
