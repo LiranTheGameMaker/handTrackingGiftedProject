@@ -3,7 +3,6 @@ import numpy as np
 from tensorflow import keras
 from tensorflow.keras.applications.mobilenet import preprocess_input
 import matplotlib.pyplot as plt
-import pandas as pd
 
 class QuickDrawPredictor():
     def __init__(self, model):
@@ -118,10 +117,20 @@ class QuickDrawPredictor():
         prediction = self.model.predict(x, verbose = 0)
         return prediction
 
-    def process(self, prediction, incorrect_list):
-        if self.label_list[np.argmax(prediction)] in incorrect_list:
-            np.delete(prediction, np.argmax(prediction))
-        return self.label_list[np.argmax(prediction)], incorrect_list
+    def process(self, prediction, guess_list):
+        prediction = np.argsort(-prediction, axis=1)
+        print(prediction)
+        print(prediction[0])
+        '''
+        for i in guess_list:
+            print(i)
+            if i in prediction:
+                prediction = np.delete(prediction, i)
+        '''
+        result = np.delete(prediction, np.where(np.in1d(prediction, guess_list))[0])
+        print(result)
+        guess_list.append(result.item(0))
+        return self.label_list[result.item(0)], guess_list
 
     def pad_right_bottom(self, data, target_size=(80, 80), pad_value=0):
         # Calculate the amount of padding needed for each dimension
