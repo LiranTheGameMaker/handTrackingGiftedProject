@@ -25,13 +25,19 @@ class QuickDrawGame:
         tracker = HandTrackerWrapper()
         mode = 0
         word = random.choice(predictor.label_list).replace('_', ' ')
+        guess_txt = "I see"
         handPositionListRT = []
         handPositionListLF = []
+        prediction = None
+        bg_image_copy = None
         game_state = 1
         hand_colors = {"Right": (0, 0, 0),
                        "Left": (0, 0, 0)}
+
         if game_state == 1:
-            while True:
+            while game_state == 1:
+                if guess_txt == "I see":
+                    cv2.putText(bg_image.copy(), guess_txt,(int(bg_image.copy().shape[0] / 2), bg_image.copy().shape[1] - 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
                 tracker.update_hands_list()
                 cv2.putText(bg_image, word, (int(bg_image.shape[0] / 2), 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0,0), 2, cv2.LINE_AA)
                 for hand in tracker.hands_list:
@@ -40,7 +46,6 @@ class QuickDrawGame:
                         if mode == 1:
                             cv2.circle(bg_image, (hand.getLandmarkX(HandLM.INDEX_FINGER_TIP),
                                                   hand.getLandmarkY(HandLM.INDEX_FINGER_TIP)), 6, color, cv2.FILLED)
-                            start_time = time.time()
                         else:
                             if hand == tracker.hands_list.right:
                                 if len(handPositionListRT) != 4:
@@ -79,13 +84,16 @@ class QuickDrawGame:
                     prediction = prediction.replace('_', ' ')
                     print(prediction)
                     print(guess_list)
-                    cv2.putText(bg_image_copy, prediction, (int(bg_image_copy.shape[0] / 2), bg_image_copy.shape[1] - 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+                    print(bg_image_copy.shape)
+                    guess_txt = guess_txt + ' ' + prediction + ','
+                    print(int(bg_image_copy.shape[0] / 2), bg_image_copy.shape[1] - 100)
+                    cv2.putText(bg_image_copy, guess_txt,(int(bg_image_copy.shape[0] / 2), bg_image_copy.shape[1] - 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
                     if prediction is word:
                         game_state = 0
+                        print("True")
                         cv2.rectangle(bg_image_copy, (0,0), (bg_image_copy.shape[0], bg_image_copy.shape[1]), (12, 216, 235))
                         cv2.putText(bg_image_copy, f"OH I KNOW, ITS {prediction.upper()}", (int(bg_image_copy.shape[0] / 2), int(bg_image_copy.shape[1] / 2)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
                     start_time = time.time()
-                    #cv2.putText(bg_image, predictor.label_list[prediction[0]])'
                 cv2.namedWindow("Canvas", cv2.WINDOW_NORMAL)
                 cv2.imshow("Canvas", bg_image_copy)
 
@@ -98,4 +106,3 @@ class QuickDrawGame:
                     break
         cv2.destroyAllWindows()
         self.is_running = False
-
